@@ -1,0 +1,38 @@
+services:
+  backend:
+    build: ./backend
+    container_name: transcendence_backend
+    ports:
+      - "3000:3000"
+    env_file: .env
+    volumes:
+      - backend-data:/app/database
+      - ./backend/uploads:/app/uploads
+      - ./backend/ssl:/app/ssl:ro
+    networks:
+      - transcendence-network
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    container_name: transcendence_frontend
+    ports:
+      - "8443:443"
+      - "8080:80"
+    env_file: .env
+    volumes:
+      - ./backend/ssl:/etc/nginx/ssl:ro
+      - ./backend/uploads:/usr/share/nginx/html/uploads:ro
+    depends_on:
+      - backend
+    networks:
+      - transcendence-network
+    restart: unless-stopped
+
+networks:
+  transcendence-network:
+    driver: bridge
+
+volumes:
+  backend-data:
+    driver: local
