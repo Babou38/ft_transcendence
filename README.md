@@ -87,6 +87,8 @@ A complete second game implementation:
 - **Customization** — ghost speed, number of lives, power-up configuration
 - **Sound effects** — waka-waka, ghost eaten, death, victory sounds
 
+<img src="assets/clip.gif" width="380"/>
+
 ## 🚀 Instructions
 
 ### 📋 Prerequisites
