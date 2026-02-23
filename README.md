@@ -1,165 +1,236 @@
-# Transcendence - Documentation du Projet
+*This project has been created as part of the 42 curriculum by bchapuis, rtehar.*
 
-## Formation et composition de l'équipe
+[![42](https://img.shields.io/badge/42-Project-blue)](https://42.fr)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-blue.svg)](https://www.typescriptlang.org/)
+[![Docker](https://img.shields.io/badge/Docker-Compose-blue.svg)](https://docs.docker.com/compose/)
+[![Fastify](https://img.shields.io/badge/Fastify-Backend-green.svg)](https://fastify.dev/)
 
-Au départ, notre équipe devait être composée de trois personnes, conformément aux consignes initiales. Cependant, au fil du processus, nous nous sommes finalement retrouvés à deux.
+# 🏓 ft_transcendence
 
-Ce choix n'a pas été immédiat. Dès la fin du cercle précédent, conscients du peu de marge de manœuvre dont nous disposions, nous avons décidé de lancer le projet rapidement, tout en cherchant activement d'autres membres.
+A full-stack single-page web application featuring real-time multiplayer Pong, a Pac-Man game, live chat, user profiles, tournaments, AI opponents, and customization — all served over HTTPS and containerized with Docker.
 
-Afin de ne pas perdre de temps, nous avons établi un squelette global des sept modules, tout en laissant une place pour de futurs coéquipiers.
+## 📖 Description
 
-Nous avons bien tenté d'intégrer une nouvelle personne, qui nous a rejoints sur Discord et Git, mais après une période d'inactivité, elle a finalement choisi de rejoindre un autre groupe. Malgré plusieurs tentatives de fusion avec d'autres équipes (notamment via des rendez-vous avec Kunfundi), aucune n'a abouti. Nous avons donc conduit l'intégralité du projet en binôme.
+ft_transcendence is the **final project** of the 42 common core. The goal is to build a complete web application from scratch where users can play Pong (and a second game) directly in their browser. The project covers the entire stack: authentication, user management, real-time communication via WebSockets, game engine rendering on Canvas, AI opponents, tournaments, a live chat system, and a stats dashboard.
 
----
+We completed this project as a **duo** (instead of the usual 3–5 people), implementing **7 major modules** worth of features.
 
-## Organisation et dynamique de collaboration
+### 🏗️ Architecture
 
-Cette configuration a eu un impact majeur sur notre manière de travailler.
-
-Travailler à deux implique forcément une charge de travail individuelle plus importante, mais offre en contrepartie une autonomie accrue.
-
-La communication s'en trouve simplifiée : 
-- Moins d'interlocuteurs
-- Moins de temps perdu à se coordonner
-- Ne demande qu'une compréhension superficielle de git
-
-Dans un groupe plus large, les différentes parties du code sont souvent très imbriquées, rendant les ajustements permanents. À deux, les tâches étaient moins interdépendantes, limitant ainsi les conflits de version ou les bugs liés à la fusion du code.
-
-Nos réunions hebdomadaires et nos échanges réguliers suffisaient à maintenir une progression efficace, là où un groupe plus nombreux aurait nécessité des processus de validation plus lourds (pull requests, revue de code, etc.).
-
----
-
-## Répartition des rôles et responsabilités
-
-Afin d'assurer une progression claire et efficace, nous avons divisé le travail en deux pôles :
-
-### Backend
-Principalement pris en charge par moi-même.
-
-### Frontend
-Géré par mon binôme.
-
-### Rôles de gestion
-
-**Project Manager (PM)** - Assumé par moi-même  
-Ce cumul s'est fait naturellement, notamment parce que la charge du backend me laissait le temps de coordonner, planifier et résoudre les bugs complexes. Même si le rôle de PM est moins visible dans une équipe réduite, il a permis de maintenir un cap cohérent tout au long du développement.
-
-**Architecte** - Assumé par mon binôme  
-Sa rigueur et son sens de la structure lui ont permis de définir l'ossature du projet, tout en veillant à ce que mon code reste clair et lisible. Ses conseils et relectures ont permis de maintenir un niveau de qualité constant dans l'ensemble du dépôt.
-
----
-
-## Bilan du travail en binôme
-
-### Avantages
-
-Travailler à deux présente de nombreux avantages :
-
-- Une meilleure fluidité dans la communication  
-- Des décisions rapides et des compromis simplifiés  
-- Une organisation allégée
-
-### Limites
-
-Cependant, cette configuration implique aussi certaines limites. En particulier, elle réduit l'aspect pédagogique du travail en groupe.
-
-Dans une équipe plus large, chaque membre doit justifier ses choix techniques et rendre son code compréhensible pour tous — un processus qui favorise l'apprentissage collectif. En binôme, cet effet est atténué, chacun se concentrant davantage sur ses modules spécifiques.
-
----
-
-## Architecture du Projet
-
-### Technologies utilisées
-
-- **Frontend**: TypeScript, Canvas API
-- **Backend**: Node.js, Fastify, TypeScript
-- **Database**: SQLite
-- **Communication**: WebSocket (WSS), HTTPS
-- **Sécurité**: JWT, SSL/TLS
-- **Deployment**: Docker, Docker Compose
-
-### Structure des modules
-
-Le projet est divisé en plusieurs modules principaux :
-
-1. **Authentification** - Gestion des utilisateurs et sessions
-2. **Jeux** - Pong et Pacman avec modes solo/duo
-3. **Tournois** - Système de bracket et matchmaking
-4. **Chat** - Messagerie temps réel avec WebSocket
-5. **Profil** - Gestion des profils utilisateurs
-6. **Amis** - Système d'amitié et blocage
-7. **Dashboard** - Statistiques et historique de jeux
-
----
-
-## Installation et Utilisation
-
-### Prérequis
-
-- Docker
-- Docker Compose
-- Make
-
-### Commandes disponibles
-
-Le projet utilise un Makefile pour simplifier les opérations. Voici les commandes disponibles :
-
-#### Démarrer le projet
-```bash
-make up
 ```
-Lance les conteneurs Docker en mode détaché. Si les certificats SSL n'existent pas, ils seront générés automatiquement.
-
-#### Arrêter le projet
-```bash
-make down
+                     ┌──────────────────────────────────────────────┐
+    HTTPS :8443      │            Docker Network                    │
+   ──────────────►   │  ┌──────────┐  /api   ┌────────────────┐     │
+                     │  │  NGINX   │◄───────►│   Fastify      │     │
+     HTTP :8080      │  │ TLSv1.2  │  /ws    │   Backend      │     │
+   ──── 301 ────►    │  │ Frontend │◄───────►│   + WebSocket  │     │
+                     │  └──────────┘         └───────┬────────┘     │
+                     │                               │              │
+                     │                         ┌─────▼──────┐       │
+                     │                         │   SQLite   │       │
+                     │                         │  Database  │       │
+                     │                         └────────────┘       │
+                     └──────────┬───────────────────┬───────────────┘
+                                │                   │
+                           ┌────▼────┐         ┌────▼────┐
+                           │Uploads  │         │   DB    │
+                           │ Volume  │         │ Volume  │
+                           └─────────┘         └─────────┘
 ```
-Arrête tous les conteneurs Docker.
 
-#### Construire les images
-```bash
-make build
+| Layer | Technology | Role |
+|---|---|---|
+| **Frontend** | TypeScript + Vite + Canvas API | SPA rendered entirely on `<canvas>`, NGINX serving static files |
+| **Backend** | Fastify (Node.js) + TypeScript | REST API + WebSocket server for chat and real-time features |
+| **Database** | SQLite (better-sqlite3) | Users, sessions, games, messages, friends, blocked users |
+| **Proxy** | NGINX | HTTPS termination (TLSv1.2/1.3), reverse proxy to backend, HTTP→HTTPS redirect |
+| **Infra** | Docker Compose | Two containers (frontend + backend), bridge network, persistent volumes |
+
+## ✨ Modules Implemented
+
+### Major Modules (×5)
+
+| Module | Description |
+|---|---|
+| **Backend Framework** | Fastify REST API with modular routes (auth, users, games, chat), session-based authentication with secure tokens, input validation, and CORS configuration |
+| **User Management** | Registration, login/logout, profile editing (username, email, avatar upload), friend system (add/remove), user blocking, online status tracking |
+| **Live Chat** | Real-time private messaging via WebSockets, message history stored in database, block/unblock users, online indicators, direct game invitations from chat |
+| **AI Opponent** | Intelligent Pong AI that predicts ball trajectory using iterative simulation with wall bounces, with configurable reaction speed and imprecision for a challenging opponent |
+| **Second Game (Pac-Man)** | Full Pac-Man implementation with maze generation, ghost AI (3 ghosts), dot collection, power pellets, lives system, solo and duo modes |
+
+### Minor Modules (×4)
+
+| Module | Description |
+|---|---|
+| **Dashboard + Stats** | User statistics dashboard with win/loss ratio, win rate percentage, charts (bar chart for game types, recent game history), streak tracking |
+| **Database** | SQLite with full schema (users, sessions, games, messages, friends, blocked users) with proper foreign keys and cascading deletes |
+| **Browser Compatibility** | Fully tested and compatible on **Firefox** and **Chrome**, consistent rendering and WebSocket behavior across both browsers |
+| **Game Customization & Power-ups** | Pong: three ball speed levels, winning score, obstacles, power-ups (speed boost, paddle grow/shrink). Pac-Man: ghost speed, lives count, power-up types |
+
+## 🎮 Games
+
+### Pong
+
+The classic game reimagined with modern features:
+- **1v1 Local** — two players on the same keyboard
+- **vs AI** — play against an intelligent AI opponent
+- **Tournament** — bracket-style tournament for 3–8 players with visual bracket display
+- **Customization** — ball speed, winning score, obstacles, power-ups
+- **Power-ups** — speed boost, paddle grow, paddle shrink
+
+### Pac-Man
+
+A complete second game implementation:
+- **Solo** — classic Pac-Man with 3 ghosts, dots, and power pellets
+- **Duo** — two players sharing the maze, competing for the highest score
+- **Tournament** — bracket-style tournament for 3–8 players with visual bracket display
+- **Customization** — ghost speed, number of lives, power-up configuration
+- **Sound effects** — waka-waka, ghost eaten, death, victory sounds
+
+## 🚀 Instructions
+
+### 📋 Prerequisites
+
+- Docker and Docker Compose
+- `make`
+- OpenSSL (for SSL certificate generation)
+
+### ⚙️ Environment
+
+Create a `.env` file at the root of the project with the following variable:
+
+```env
+JWT_SECRET=your_secret_key_here
 ```
-Construit (ou reconstruit) les images Docker. Génère également les certificats SSL si nécessaire.
 
-#### Nettoyer complètement
-```bash
-make clean
-```
-Arrête et supprime tout : conteneurs, volumes, et images Docker.
-
-#### Nettoyer uniquement les volumes
-```bash
-make clean-volumes
-```
-Arrête les conteneurs et supprime uniquement les volumes (conserve les images).
-
-#### Afficher l'aide
-```bash
-make help
-```
-Affiche la liste des commandes disponibles.
-
-### Accès à l'application
-
-Une fois le projet démarré avec `make up`, l'application est accessible à :
-
-- **URL**: `https://localhost:8443`
-- **Note**: Comme le projet utilise des certificats SSL auto-signés, votre navigateur affichera un avertissement de sécurité. Il faut accepter le certificat pour accéder à l'application.
-
-### Workflow typique
+### 🔨 Build & Run
 
 ```bash
-# Première utilisation
-make build    # Construire les images
-make up       # Démarrer le projet
+# Generate SSL certificates + build + start
+make
 
-# Développement quotidien
-make down     # Arrêter
-make up       # Redémarrer
-
-# Nettoyage complet (en cas de problème)
-make clean    # Tout supprimer
-make build    # Reconstruire
-make up       # Relancer
+# Or step by step:
+make ssl       # Generate self-signed SSL certificates
+make build     # Build Docker images
+make up        # Start containers
 ```
+
+The application is accessible at:
+```
+https://localhost:8443
+```
+
+### 🧪 Available Commands
+
+```bash
+make          # Full setup (ssl + build + up)
+make up       # Start containers
+make down     # Stop containers
+make restart  # Restart containers
+make logs     # View container logs
+make clean    # Stop + remove volumes
+make fclean   # Full cleanup (images, volumes, SSL certs)
+make re       # Full rebuild from scratch
+```
+
+## 🗂️ Project Structure
+
+```
+ft_transcendence/
+├── Makefile                    # Build orchestration
+├── docker-compose.yml          # Service definitions
+├── generate-ssl.sh             # SSL certificate generation
+│
+├── backend/
+│   ├── Dockerfile
+│   ├── package.json / tsconfig.json
+│   ├── server.ts               # Fastify server setup (HTTPS, CORS, WebSocket)
+│   │
+│   ├── auth/
+│   │   ├── auth.routes.ts      # /api/auth — register, login, logout, session
+│   │   ├── AuthService.ts      # Password hashing (bcrypt), token generation
+│   │   ├── SessionManager.ts   # Session CRUD with expiry
+│   │   └── authMiddleware.ts   # Route protection middleware
+│   │
+│   ├── users/
+│   │   ├── users.routes.ts     # /api/users — profile, friends, blocking, avatar
+│   │   ├── UserService.ts      # User CRUD operations
+│   │   ├── FriendsService.ts   # Friend add/remove/list
+│   │   ├── BlockService.ts     # Block/unblock users
+│   │   └── AvatarService.ts    # Avatar upload and management
+│   │
+│   ├── games/
+│   │   ├── games.routes.ts     # /api/games — game history, stats, dashboard
+│   │   └── GamesService.ts     # Game recording and statistics queries
+│   │
+│   ├── chat/
+│   │   ├── chat.routes.ts      # /api/chat — message history
+│   │   ├── ChatService.ts      # Message storage and retrieval
+│   │   └── WebSocketManager.ts # Real-time messaging + online status
+│   │
+│   └── database/
+│       ├── db.ts               # SQLite connection (better-sqlite3)
+│       ├── init.ts             # Database initialization
+│       └── schema.sql          # Full database schema
+│
+└── frontend/
+    ├── Dockerfile
+    ├── nginx.conf              # NGINX config (HTTPS, reverse proxy, SPA)
+    ├── index.html
+    ├── vite.config.ts
+    │
+    ├── auth/                   # Login, registration, Player 2 auth screens
+    ├── chat/                   # Chat UI, WebSocket client
+    ├── menu/                   # Menu, customization screens
+    ├── profile/                # Profile, friends list, dashboard, settings
+    │
+    └── games/
+        ├── pong/               # PongGame, Ball, Paddle, HumanPlayer, AIPlayer, AIController
+        │   ├── PowerUpManager  # Pong power-ups system
+        │   └── PongEndScreen   # End game screen with stats
+        ├── pacman/             # PacmanGame, Pacman, Ghost, Maze, SoundManager
+        │   ├── PacmanPowerUpManager  # Pac-Man power-ups
+        │   └── PacmanEndScreen
+        ├── tournament/         # Tournament bracket, match screens
+        ├── config/             # Game configs, customization options
+        └── GameRecorder.ts     # Records game results to backend
+ 
+
+```
+
+## 🔒 Security
+
+- **HTTPS enforced** — All traffic served over TLSv1.2/1.3, HTTP automatically redirected to HTTPS
+- **JWT authentication** — Stateless session tokens with expiry, validated on every protected route via middleware
+- **Password hashing** — bcrypt with salt rounds, no plaintext storage
+- **SQL injection prevention** — All database queries use parameterized prepared statements (better-sqlite3)
+- **XSS protection** — All user input is sanitized and escaped before rendering, no raw HTML injection
+- **Input validation** — Server-side validation on all endpoints (username format, email format, password strength, value ranges)
+- **CORS policy** — Restricted to allowed origins only
+- **User blocking** — Blocked users cannot send messages or interact
+
+## 📐 Code Standards
+
+This project follows:
+- **TypeScript strict mode** — Type safety across the entire codebase
+- **Modular architecture** — Clear separation between auth, users, games, chat
+- **HTTPS everywhere** — TLSv1.2/1.3, HTTP automatically redirected to HTTPS
+- **Session security** — Secure random tokens, expiry management, middleware protection
+- **Input validation** — All user input validated server-side (ValidationService)
+- **Password security** — bcrypt hashing with salt rounds
+- **No external game libraries** — Both games rendered from scratch on Canvas API
+- **SPA routing** — Single `index.html`, all navigation handled client-side
+
+## 📚 Resources
+
+- [Fastify documentation](https://fastify.dev/docs/latest/) — Backend framework reference
+- [Vite documentation](https://vitejs.dev/guide/) — Frontend build tool
+- [Canvas API (MDN)](https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API) — 2D rendering used for all game graphics
+- [WebSocket API (MDN)](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API) — Real-time communication for chat
+- [better-sqlite3](https://github.com/WiseLibs/better-sqlite3) — Synchronous SQLite3 driver for Node.js
+- [Docker Compose documentation](https://docs.docker.com/compose/) — Container orchestration
+- [NGINX documentation](https://nginx.org/en/docs/) — Reverse proxy and HTTPS configuration
+
+### 🤖 AI Usage
+
+No AI tools were used during the development of this project.
